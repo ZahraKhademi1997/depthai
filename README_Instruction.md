@@ -27,3 +27,7 @@
 # Running
 `cd depthai/depthai_sdk/examples/recording
 python record_all.py --rgbResolution 1920x1080 --recordStream`
+
+# Converting to mp4
+`ffmpeg -i color.avi -c:v libx264 -crf 23 output.mp4
+`
