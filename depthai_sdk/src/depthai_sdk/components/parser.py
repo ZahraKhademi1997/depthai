@@ -46,24 +46,50 @@ def encoder_profile_to_fourcc(profile: dai.VideoEncoderProperties.Profile) -> st
     raise ValueError(f'Unknown encoder profile: {profile}')
 
 
-def mono_resolution(resolution: Union[
-    None, str, dai.MonoCameraProperties.SensorResolution]) -> dai.MonoCameraProperties.SensorResolution:
+# def mono_resolution(resolution: Union[
+#     None, str, dai.MonoCameraProperties.SensorResolution]) -> dai.MonoCameraProperties.SensorResolution:
+#     """
+#     Parses Mono camera resolution based on the string
+#     """
+#     if isinstance(resolution, dai.MonoCameraProperties.SensorResolution) or resolution is None:
+#         return resolution
+
+#     resolution = str(resolution).upper()
+#     if resolution == '800' or resolution == '800P' or resolution == '1MP':
+#         return dai.MonoCameraProperties.SensorResolution.THE_800_P
+#     elif resolution == '720' or resolution == '720P':
+#         return dai.MonoCameraProperties.SensorResolution.THE_720_P
+#     elif resolution == '480' or resolution == '480P':
+#         return dai.MonoCameraProperties.SensorResolution.THE_480_P
+#     else:  # Default
+#         return dai.MonoCameraProperties.SensorResolution.THE_400_P
+
+def mono_resolution(resolution: Union[None, str, dai.MonoCameraProperties.SensorResolution]) -> dai.MonoCameraProperties.SensorResolution:
     """
-    Parses Mono camera resolution based on the string
+    Parses Mono camera resolution based on the string.
     """
-    if isinstance(resolution, dai.MonoCameraProperties.SensorResolution) or resolution is None:
+    if isinstance(resolution, dai.MonoCameraProperties.SensorResolution):
         return resolution
+    if resolution is None:
+        return dai.MonoCameraProperties.SensorResolution.THE_480_P  # Default if none provided
 
-    resolution = str(resolution).upper()
-    if resolution == '800' or resolution == '800P' or resolution == '1MP':
-        return dai.MonoCameraProperties.SensorResolution.THE_800_P
-    elif resolution == '720' or resolution == '720P':
-        return dai.MonoCameraProperties.SensorResolution.THE_720_P
-    elif resolution == '480' or resolution == '480P':
-        return dai.MonoCameraProperties.SensorResolution.THE_480_P
-    else:  # Default
-        return dai.MonoCameraProperties.SensorResolution.THE_400_P
-
+    resolution_map = {
+        '800': dai.MonoCameraProperties.SensorResolution.THE_800_P,
+        '800P': dai.MonoCameraProperties.SensorResolution.THE_800_P,
+        '1MP': dai.MonoCameraProperties.SensorResolution.THE_800_P,
+        '720': dai.MonoCameraProperties.SensorResolution.THE_720_P,
+        '720P': dai.MonoCameraProperties.SensorResolution.THE_720_P,
+        '480': dai.MonoCameraProperties.SensorResolution.THE_480_P,
+        '480P': dai.MonoCameraProperties.SensorResolution.THE_480_P,
+        '400': dai.MonoCameraProperties.SensorResolution.THE_400_P,
+        '400P': dai.MonoCameraProperties.SensorResolution.THE_400_P
+    }
+    
+    res_key = resolution.upper().replace('THE_', '').replace('_', '')
+    if res_key in resolution_map:
+        return resolution_map[res_key]
+    else:
+        raise ValueError(f"Unsupported resolution: {resolution}")
 
 def parse_resolution(
         camera: Union[dai.node.ColorCamera, dai.node.MonoCamera, Type],
